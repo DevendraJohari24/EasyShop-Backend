@@ -1,49 +1,64 @@
 const mongoose = require("mongoose");
 
 const productSchema = mongoose.Schema({
-    name: {
+    title: {
         type:  String,
-        required: [true, "Please Enter product Name"],
+        required: [true, "Title should not be empty"],
         trim: true,
     },
     description: {
         type: String,
-        required: [true, "Please Enter the description"]
+        required: [true, "Description should not be empty"]        
     },
     price: {
         type: Number,
-        required: [true, "Please Enter product Price"],
-        maxLength: [8, "Price cannot exceed 8 characters"],
+        required: [true, "Price should not be empty"]
     },
-    ratings: {
+    discount: {
         type: Number,
-        default: 0
+        required: [true, "Discount should not be empty"]
     },
+    label: {
+        type: String,
+    },
+    image:   {
+        public_id: {
+            type: String,
+            required: [true, "Public Id of Image should not be empty"],
+        },
+        url: {
+            type: String,
+            required: [true, "URL of Image should not be empty"]
+        }
+   },
     images: [
-       {
+        {
             public_id: {
                 type: String,
-                required: true,
+                required: [true, "Public Id of Image should not be empty"],
             },
             url: {
                 type: String,
-                required: true
+                required: [true, "URL of Image should not be empty"]
             }
-       } 
+       }
     ],
     category: {
-        type: String,
-        required: [true, "Please Enter Product Category"],
+        type:  [String],
+        required: [true, "Category should not be empty"],
+    },
+    rating: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    numReviews: {
+        type: Number,
+        default: 0
     },
     stock: {
         type: Number,
-        required: [true, "Please Enter product Stock"],
-        maxLength: [4, "Stock cannot exceed 4 characters"],
-        default: 1,
-    },
-    numOfReviews: {
-        type: Number,
-        default: 0,
+        required: [true, "Stock Should not be empty"]
     },
     reviews: [
         { 
@@ -51,11 +66,21 @@ const productSchema = mongoose.Schema({
                 type:  mongoose.Schema.ObjectId,
                 ref: "User",
                 required: true,
-        }   ,
+            },
             name: {
                 type: String,
                 required: true,
             },
+            image:   {
+                public_id: {
+                    type: String,
+                    required: [true, "Public Id of Image should not be empty"],
+                },
+                url: {
+                    type: String,
+                    required: [true, "URL of Image should not be empty"]
+                }
+           },
             rating: {
                 type: Number,
                 required: true,
@@ -66,7 +91,7 @@ const productSchema = mongoose.Schema({
             }
         }
     ],
-    user: {
+    createdBy: {
         type:  mongoose.Schema.ObjectId,
         ref: "User",
         required: true,

@@ -4,29 +4,23 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-    const { token } = req.cookies;
-
-    if(!token){
-        return next(new ErrorHandler("Please Login to access this resource", 401));
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    if (!authHeader?.startsWith('Bearer ')){
+        return next(new ErrorHandler("Invalid Headers", 401))
     }
-
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = await User.findById(decodedData.id);
-
-    next();
+    const token = authHeader.split(' ')[1];
+    jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+        (err, decoded) => {
+            if (err){
+                return next(new ErrorHandler("Invalid Token", 403))
+            }
+            console.log(decoded);
+            req.userId = decoded.UserInfo.user;
+            req.roles = decoded.UserInfo.roles;
+            next();
+        }
+    );
 });
 
-
-exports.authorizeRoles = (...roles) => {
-    console.log(roles);
-    return (req, res, next) => {
-        if(!roles.includes(req.user.role)){
-            new ErrorHandler(
-                `Role: ${req.user.role} is not allowed to access this resource`,
-                403
-            )
-        }
-        next();
-    }
-}
